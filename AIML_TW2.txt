@@ -1,0 +1,63 @@
+%TW2
+% Step 1: Load dataset
+data = readmatrix('C:\Users\HP\OneDrive\Desktop\Academic year 2024-25\EVEN SEMESTER\AIML\UNIT 2\ Datasets\swedish_insurance.csv'); % Replace with your path if needed
+X = data(:, 1); % Feature y = data(:, 2); % Target
+m = length(y); % Number of training examples
+
+% Step 2: Feature Scaling (optional but helps gradient descent convergence)
+X = (X - mean(X)) / std(X);
+
+% Step 3: Add intercept term to X
+X_b = [ones(m, 1), X];  % X_b is the augmented design matrix
+% Step 4: Initialize parameters
+theta = zeros(2, 1);    % [theta0; theta1]
+alpha = 0.01;           % Learning rate
+num_iters = 1000;       % Number of iterations
+J_history = zeros(num_iters, 1);  % For cost tracking
+
+ % Step 5: Gradient Descent
+ for iter = 1:num_iters
+    predictions = X_b * theta;            % Hypothesis
+    errors = predictions - y;             % Errors
+    gradient = (1/m) * (X_b' * errors);   % Gradient
+    theta = theta - alpha * gradient;     % Update rule
+    % Compute and store the cost
+    J_history(iter) = (1/(2*m)) * sum(errors .^ 2);
+ end
+
+  % Step 6: Display results
+fprintf('Theta found by gradient descent:\n');
+fprintf('Intercept: %.4f\n', theta(1));
+fprintf('Slope: %.4f\n', theta(2));
+
+ % Step 7: Plot cost over iterations
+ figure;
+ plot(1:num_iters, J_history, 'b-', 'LineWidth', 2);
+ xlabel('Iteration');
+ ylabel('Cost J');
+ title('Convergence of Gradient Descent');
+ grid on;
+
+  % Step 8: Plot data and regression line
+ figure;
+ plot(X, y, 'bo'); hold on;
+ plot(X, X_b * theta, 'r-', 'LineWidth', 2);
+ xlabel('Feature (Normalized)');
+ ylabel('Target');
+ title('Linear Regression with Gradient Descent');
+ legend('Training Data', 'Linear Regression Line');
+ grid on;
+
+  % Step 9: Make a New Prediction
+ % Suppose we want to predict the target for a new feature value x_new = 6
+ x_new = 6;
+ % Normalize the new input using the same mean and std as training data
+ x_new_norm = (x_new - mean(data(:,1))) / std(data(:,1));
+ % Add intercept term
+ x_new_b = [1, x_new_norm];
+ % Predict using learned parameters
+ y_new_pred = x_new_b * theta;
+ fprintf('For a new input x = %.2f, the predicted y = %.2f\n', x_new, y_new_pred);
+ % Optional: Plot the new prediction point
+ plot(x_new_norm, y_new_pred, 'gs', 'MarkerSize', 10, 'MarkerFaceColor', 'g');
+ legend('Training Data', 'Linear Regression Line', 'New Prediction');

@@ -1,0 +1,34 @@
+clear; clc;
+
+%TW4
+% Step 1: Load and preprocess the data 
+filename = 'DataSets/weather_data.csv'; 
+data = readtable(filename);
+
+ % Convert all columns to categorical
+ for i = 1:width(data)
+    data.(i) = categorical(data.(i));
+ end
+
+  % Separate features and target
+X = data(:, 1:end - 1);
+y = categorical(data{:, end});
+ % Step 2: Train-Test Split
+cv = cvpartition(height(data), 'HoldOut', 0.20);
+XTrain = X(training(cv), :);
+yTrain = y(training(cv));
+XTest = X(test(cv), :);
+yTest = y(test(cv));
+
+ % Step 3: Train Naive Bayes model
+nbModel = fitcnb(XTrain, yTrain);
+
+ % Step 4: Prediction and Accuracy
+yPred = predict(nbModel, XTest);
+accuracy = sum(yPred == yTest) / numel(yTest);
+fprintf('Test Accuracy: %.2f%%\n', accuracy * 100);
+ % Step 5: Predict for a new weather condition
+newData = table(categorical("Sunny"), categorical("Cool"), ("Normal"), categorical("Strong"), ... 
+VariableNames', X.Properties.VariableNames);
+newPred = predict(nbModel, newData);
+fprintf('Prediction for new sample: %s\n', string(newPred));
